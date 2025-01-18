@@ -39,7 +39,7 @@ class Trainer:
     def train(self):
         # !!! does not create copies !!!
         model, config = self.model, self.config
-        self.optimizer = torch.optim.Adam(model.parameters(), lr=config.lr)
+        self.optimizer = torch.optim.AdamW(model.parameters(), lr=config.lr)
         train_loader = DataLoader(
             self.train_dataset,
             batch_size=config.batch_size,
