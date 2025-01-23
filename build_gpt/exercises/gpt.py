@@ -9,7 +9,6 @@ from dataclasses import dataclass
 class hp:
     n_embd: int = 16
     n_heads: int = 4
-    head_sz: int = n_embd // n_heads
     dropout: float = 0.2
     blk_sz: int = 6
     num_blks: int = 2
@@ -20,8 +19,8 @@ class CausalAttn(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.n_heads = config.n_heads
-        self.head_sz = config.head_sz
         self.n_embd = config.n_embd
+        self.head_sz = self.n_embd // self.n_heads
 
         self.attn = nn.Linear(self.n_embd, 3*self.n_embd)
         self.register_buffer('tril', torch.tril(torch.ones((config.blk_sz, config.blk_sz))))
@@ -74,9 +73,9 @@ class Block(nn.Module):
     """A transformer block with causal attention, an MLP, and layer norm with residual connections."""
     def __init__(self, config):
         super().__init__()
-        self.head_sz = config.head_sz
-        self.n_heads = config.n_heads
         self.n_embd = config.n_embd
+        self.n_heads = config.n_heads
+        self.head_sz = self.n_embd // self.n_heads
         self.blk_sz = config.blk_sz
         self.causal_attn = CausalAttn(config)
         self.ffwd = FeedForward(config)
